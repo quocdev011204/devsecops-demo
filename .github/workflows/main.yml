@@ -1,4 +1,4 @@
-name: DevSecOps Pipeline - Trivy & ZAP
+name: DevSecOps Pipeline - DefectDojo Ready
 on:
   push:
     branches: ["main"]
@@ -6,6 +6,7 @@ on:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -13,28 +14,27 @@ jobs:
         uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: "bkimminich/juice-shop:latest"
-          format: "table"
-          exit-code: "0"
-          ignore-unfixed: true
+          format: "json"
+          output: "trivy-report.json"
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
+          exit-code: "0"
       - name: Start Juice Shop Container
         run: |
-          # Chạy Juice Shop ở chế độ chạy ngầm (detached), map port 3007
           docker run --rm -d -p 3007:3000 --name juice-shop bkimminich/juice-shop:latest
-
-          # Hack nhỏ: Đợi 30s để web khởi động xong hoàn toàn
           echo "Đang đợi ứng dụng khởi động..."
           sleep 30
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.13.0
         with:
           target: "http://localhost:3007"
-          cmd_options: "-a"
+          cmd_options: "-x zap-report.xml"
           allow_issue_writing: false
-      - name: Upload ZAP Report
+      - name: Upload Security Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ZAP-Report
-          path: report_html.html
+          name: Security-Reports
+          path: |
+            trivy-report.json
+            zap-report.xml
