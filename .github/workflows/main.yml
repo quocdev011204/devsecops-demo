@@ -20,8 +20,8 @@ jobs:
           severity: "CRITICAL,HIGH"
       - name: Start Juice Shop Container
         run: |
-          # Chạy Juice Shop ở chế độ chạy ngầm (detached), map port 3000
-          docker run --rm -d -p 3000:3000 --name juice-shop bkimminich/juice-shop:latest
+          # Chạy Juice Shop ở chế độ chạy ngầm (detached), map port 3007
+          docker run --rm -d -p 3007:3000 --name juice-shop bkimminich/juice-shop:latest
 
           # Hack nhỏ: Đợi 30s để web khởi động xong hoàn toàn
           echo "Đang đợi ứng dụng khởi động..."
@@ -29,7 +29,7 @@ jobs:
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.13.0
         with:
-          target: "http://localhost:3000"
+          target: "http://localhost:3007"
           cmd_options: "-a"
           allow_issue_writing: false
       - name: Upload ZAP Report
