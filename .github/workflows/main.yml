@@ -29,21 +29,20 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
           exit-code: "0"
-      - name: 🚀 Start App Container Test
+      - name: 🚀 Start App Container
         if: success()
         run: |
-          docker run --rm -d -p 3007:3000 --name juice-shop bkimminich/juice-shop:latest
+          docker run --rm -d -p 3000:3000 --name juice-shop bkimminich/juice-shop:latest
           echo "Waiting for app to start..."
           sleep 30
-
       - name: ⚡ DAST Scan (OWASP ZAP)
         if: success()
         uses: zaproxy/action-baseline@v0.13.0
         with:
-          target: "http://localhost:3007"
+          target: "http://localhost:3000"
           cmd_options: "-x zap-report.xml"
           allow_issue_writing: false
-
+          artifact_name: "zap-scan-logs"
       - name: 📂 Upload Reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -57,7 +56,7 @@ jobs:
         uses: nobrayner/discord-webhook@v1
         with:
           github-token: ${{ secrets.github_token }}
-          webhooks-url: ${{ secrets.DISCORD_WEBHOOK }}
+          discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
           username: "DevSecOps Bot"
           avatar-url: "https://cdn-icons-png.flaticon.com/512/2092/2092663.png"
           description: "🔒 Security Scan Status: ${{ job.status }}! \nCheck GitHub Actions for details."
