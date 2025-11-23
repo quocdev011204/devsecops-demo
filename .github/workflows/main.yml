@@ -29,7 +29,7 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
           exit-code: "0"
-      - name: 🚀 Start App Container
+      - name: 🚀 Start App Container Test
         if: success()
         run: |
           docker run --rm -d -p 3007:3000 --name juice-shop bkimminich/juice-shop:latest
