@@ -19,7 +19,7 @@ jobs:
           exit-code: "1"
           vuln-type: "os,library"
           scanners: "secret"
-          severity: "CRITICAL,HIGH"
+          secret-severities: "CRITICAL,HIGH,MEDIUM"
       - name: 🐳 Build & Scan Docker Image
         if: success()
         uses: aquasecurity/trivy-action@0.24.0
@@ -33,7 +33,7 @@ jobs:
       - name: 🚀 Start App Container
         if: success()
         run: |
-          docker run --rm -d -p 3000:3000 --name juice-shop bkimminich/juice-shop:latest
+          docker run --rm -d -p 3007:3000 --name juice-shop bkimminich/juice-shop:latest
           echo "Waiting for app to start..."
           sleep 30
       - name: ⚡ DAST Scan (OWASP ZAP)
@@ -43,7 +43,7 @@ jobs:
           chmod 777 $(pwd)
           # Chạy Docker ZAP, mount thư mục hiện tại vào để lấy báo cáo
           docker run --network host -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
-          -t http://localhost:3000 \
+          -t http://localhost:3007 \
           -x zap-report.xml \
           -I # (Tùy chọn) -I nghĩa là bỏ qua lỗi cảnh báo, nếu muốn pipeline đỏ khi có lỗi thì bỏ -I đi
       - name: 📂 Upload Reports
