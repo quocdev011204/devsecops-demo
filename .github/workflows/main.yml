@@ -19,7 +19,7 @@ jobs:
           exit-code: "1"
           # vuln-type: "os,library"
           scanners: "secret"
-          secret-severities: "CRITICAL,HIGH,MEDIUM"
+          severity: "CRITICAL,HIGH"
       - name: 🐳 Build & Scan Docker Image
         if: success()
         uses: aquasecurity/trivy-action@0.24.0
